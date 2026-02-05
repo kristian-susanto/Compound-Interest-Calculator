@@ -8,8 +8,7 @@ An interactive web application based on Streamlit to calculate investment projec
 - Flexible Input: Set the initial investment, monthly contribution, term, and estimated interest.
 - Interest Frequency: Choose from daily, monthly, quarterly, and annual compounding options.
 - Interactive Visualization: Dynamic line charts using Plotly.
-- Data Export: Download the full report in PDF format (including graphs and tables).
-- Export raw data to Excel (.xlsx) format.
+- Data Export: Download the full report in PDF format (including graphs and tables) or export raw data to Excel (.xlsx) format.
 
 ## Folder Structure
 
@@ -19,7 +18,7 @@ Compound-Interest-Calculator/
 ├── .gitignore
 ├── Home.py
 ├── README.MD
-└── requirements. txt
+└── requirements.txt
 ```
 
 ## 🚀 How to Run
@@ -60,14 +59,11 @@ pip install streamlit pandas plotly fpdf2 kaleido xlsxwriter
 streamlit run Home.py
 ```
 
-💡 Tip: Running Without Browser Errors
 If you find it annoying to see error messages (like "unclean kill") every time you run an application, you can run Streamlit without trying to automatically open a browser with the following command:
 
 ```bash
 streamlit run app.py --server.headless true
 ```
-
-Why is this helpful? With this command, Streamlit will not try to open/close the browser itself, so browser automation error messages will not appear.
 
 The application will automatically open in the browser at http://localhost:8501.
 
