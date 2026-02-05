@@ -8,7 +8,7 @@ An interactive web application based on Streamlit to calculate investment projec
 - Flexible Input: Set the initial investment, monthly contribution, term, and estimated interest.
 - Interest Frequency: Choose from daily, monthly, quarterly, and annual compounding options.
 - Interactive Visualization: Dynamic line charts using Plotly.
-- Data Export: Download the full report in PDF format (including graphs and tables) or export raw data to Excel (.xlsx) format.
+- Data Export: Download the full report in PDF format (including graphs and tables) or export raw data to Excel.
 
 ## Folder Structure
 
