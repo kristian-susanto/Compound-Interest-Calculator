@@ -18,7 +18,6 @@ Compound-Interest-Calculator/
 ├── .gitignore
 ├── Home.py
 ├── README.MD
-├── packages.txt
 └── requirements.txt
 ```
 
