@@ -56,7 +56,7 @@ pip install streamlit pandas plotly fpdf2 kaleido xlsxwriter
 ### 3. Run Streamlit Application
 
 ```bash
-streamlit run Home.py
+streamlit run App.py
 ```
 
 If you find it annoying to see error messages (like "unclean kill") every time you run an application, you can run Streamlit without trying to automatically open a browser with the following command:
@@ -66,5 +66,3 @@ streamlit run app.py --server.headless true
 ```
 
 The application will automatically open in the browser at http://localhost:8501.
-
-Made with Streamlit & Python.
