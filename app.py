@@ -8,6 +8,22 @@ st.set_page_config(page_title="Compound Interest Calculator", page_icon="🪄")
 
 st.title("🧮 Kalkulator Bunga Majemuk")
 
+# Fungsi pembantu untuk konversi teks ke float
+def parse_money(text):
+    # Menghapus karakter non-digit kecuali titik/koma desimal
+    clean_text = ''.join(c for c in text if c.isdigit() or c in '.,')
+    try:
+        return float(clean_text.replace(',', '')) # Sesuaikan jika menggunakan format IDR
+    except:
+        return 0.0
+
+# Fungsi pembantu untuk memformat angka ke gaya Indonesia (1.000.000,00)
+def format_idr(angka):
+    # Menggunakan f-string untuk ribuan dengan koma, lalu ditukar agar sesuai standar IDR
+    # Ribuan jadi titik, desimal jadi koma
+    formatted = "{:,.2f}".format(angka).replace(",", "X").replace(".", ",").replace("X", ".")
+    return formatted
+
 # --- INPUT ---
 with st.sidebar:
     st.header("Parameter Investasi")
@@ -15,14 +31,38 @@ with st.sidebar:
     currency_choice = st.selectbox("Pilih Mata Uang", options=["Yuan (¥)", "US Dollar ($)", "Rupiah (Rp)"])
     symbol = "¥" if currency_choice == "Yuan (¥)" else ("$" if currency_choice == "US Dollar ($)" else "Rp")
     
-    principal = st.number_input(f"Investasi Awal ({symbol})", value=1000000.0, step=100000.0)
-    monthly_contribution = st.number_input(f"Kontribusi Bulanan ({symbol})", value=1000000.0, step=100000.0)
+    # 1. Input Investasi Awal
+    # Kita gunakan format="%f" agar input menerima angka desimal
+    principal = st.number_input(
+        f"Investasi Awal ({symbol})", 
+        value=1000000.0, 
+        step=100000.0, 
+        format="%.2f" 
+    )
+    # Caption yang diformat khusus agar sama dengan input (titik=ribuan, koma=desimal)
+    st.caption(f"Terbaca: **{symbol} {format_idr(principal)}**")
+    
+    # 2. Input Kontribusi Bulanan
+    monthly_contribution = st.number_input(
+        f"Kontribusi Bulanan ({symbol})", 
+        value=1000000.0, 
+        step=100000.0, 
+        format="%.2f"
+    )
+    st.caption(f"Terbaca: **{symbol} {format_idr(monthly_contribution)}**")
+
     years = st.number_input("Jangka Waktu (Tahun)", min_value=1, value=20)
     annual_rate = st.number_input("Estimasi Bunga Tahunan (%)", value=20.0, step=0.5)
     
     compounding_freq = st.selectbox(
         "Frekuensi Bunga Majemuk",
-        options=["Annually (Tahunan)", "Monthly (Bulanan)"],
+        options=[
+            "Annually (Tahunan)", 
+            "Semiannually (6 Bulanan)", 
+            "Quarterly (Kuartal)", 
+            "Monthly (Bulanan)", 
+            "Daily (Harian)"
+        ],
         index=0
     )
 
@@ -31,20 +71,40 @@ r = annual_rate / 100
 current_balance = principal
 total_contributions = principal
 
+# Mapping frekuensi ke jumlah periode per tahun
+freq_map = {
+    "Annually (Tahunan)": 1,
+    "Semiannually (6 Bulanan)": 2,
+    "Quarterly (Kuartal)": 4,
+    "Monthly (Bulanan)": 12,
+    "Daily (Harian)": 365
+}
+
+n = freq_map[compounding_freq]
+
 data = []
 data.append({"Year": 0, "Future Value": current_balance, "Total Contributions": total_contributions})
 
 for year in range(1, int(years) + 1):
+    # Hitung kontribusi tahunan (tetap dijumlahkan per bulan sesuai input awal)
+    yearly_contribution = monthly_contribution * 12
+    
+    # Perhitungan berdasarkan frekuensi yang dipilih
     if compounding_freq == "Annually (Tahunan)":
         interest_earned = current_balance * r
-        yearly_contribution = monthly_contribution * 12
         current_balance = current_balance + interest_earned + yearly_contribution
-        total_contributions += yearly_contribution
     else:
-        for _ in range(12):
-            current_balance += monthly_contribution
-            total_contributions += monthly_contribution
-            current_balance *= (1 + r/12)
+        # Untuk frekuensi selain tahunan, kita bagi dalam sub-periode
+        # Contoh: Monthly (12x), Quarterly (4x), Semiannually (2x), Daily (365x)
+        periods_in_year = n
+        contribution_per_period = yearly_contribution / periods_in_year
+        
+        for _ in range(int(periods_in_year)):
+            # Bunga dihitung dari saldo yang ada sebelum kontribusi periode tersebut (standar finansial)
+            interest_this_period = current_balance * (r / n)
+            current_balance += contribution_per_period + interest_this_period
+            
+    total_contributions += yearly_contribution
 
     data.append({
         "Year": year,
@@ -98,7 +158,8 @@ fig.update_layout(
 
 fig.update_xaxes(showgrid=False, tickangle=-45)
 
-st.plotly_chart(fig, use_container_width=True)
+# Menggunakan width="stretch" sebagai pengganti use_container_width
+st.plotly_chart(fig, width="stretch")
 
 def create_pdf(dataframe, figure, symbol_label):
     pdf = FPDF()
