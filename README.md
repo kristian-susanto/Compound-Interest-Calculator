@@ -18,6 +18,7 @@ Compound-Interest-Calculator/
 ├── .gitignore
 ├── Home.py
 ├── README.MD
+├── packages.txt
 └── requirements.txt
 ```
 
@@ -56,7 +57,7 @@ pip install streamlit pandas plotly fpdf2 kaleido xlsxwriter
 ### 3. Run Streamlit Application
 
 ```bash
-streamlit run App.py
+streamlit run app.py
 ```
 
 If you find it annoying to see error messages (like "unclean kill") every time you run an application, you can run Streamlit without trying to automatically open a browser with the following command:
