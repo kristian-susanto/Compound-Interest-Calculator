@@ -27,8 +27,8 @@ Compound-Interest-Calculator/
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/kristian-susanto/LSTM-Stock-Price-Prediction.git
-cd LSTM-Stock-Price-Prediction
+git clone https://github.com/kristian-susanto/Compound-Interest-Calculator.git
+cd Compound-Interest-Calculator
 ```
 
 ### 2. Dependency Installation
