@@ -161,43 +161,87 @@ fig.update_xaxes(showgrid=False, tickangle=-45)
 # Menggunakan width="stretch" sebagai pengganti use_container_width
 st.plotly_chart(fig, width="stretch")
 
-def create_pdf(dataframe, figure, symbol_label):
+# def create_pdf(dataframe, figure, symbol_label):
+#     pdf = FPDF()
+#     pdf.add_page()
+    
+#     # Judul
+#     pdf.set_font("helvetica", "B", 16)
+#     pdf.cell(190, 10, "Laporan Investasi Bunga Majemuk", align="C")
+#     pdf.ln(10)
+    
+#     # Gunakan width yang lebih besar saat render agar teks tidak bertumpuk
+#     img_bytes = figure.to_image(format="png", width=1200, height=700, scale=2)
+#     img_buf = io.BytesIO(img_bytes)
+
+#     # x=5 (melebar ke kiri) dan w=200 (memenuhi lebar kertas A4)
+#     pdf.image(img_buf, x=5, y=30, w=200)
+    
+#     # Pindah ke bawah grafik untuk tabel
+#     pdf.set_y(155)
+    
+#     # ... (bagian tabel tetap sama) ...
+#     pdf.set_font("helvetica", "B", 12)
+#     pdf.cell(190, 10, "Tabel Pertumbuhan Tahunan")
+#     pdf.ln(10)
+    
+#     # Header Tabel
+#     pdf.set_font("helvetica", "B", 10)
+#     pdf.set_fill_color(200, 200, 200)
+#     pdf.cell(35, 10, "Tahun", border=1, align="C", fill=True)
+#     pdf.cell(75, 10, f"Value ({symbol_label})", border=1, align="C", fill=True)
+#     pdf.cell(75, 10, f"Kontribusi ({symbol_label})", border=1, align="C", fill=True)
+#     pdf.ln()
+
+#     # Isi Tabel
+#     pdf.set_font("helvetica", "", 10)
+#     for index, row in dataframe.iterrows():
+#         if pdf.get_y() > 260: 
+#             pdf.add_page()
+#         pdf.cell(35, 8, f"Year {int(row['Year'])}", border=1, align="C")
+#         pdf.cell(75, 8, f"{row['Future Value']:,.2f}", border=1, align="R")
+#         pdf.cell(75, 8, f"{row['Total Contributions']:,.2f}", border=1, align="R")
+#         pdf.ln()
+        
+#     return bytes(pdf.output())
+
+def create_pdf(dataframe, symbol_label):
     pdf = FPDF()
     pdf.add_page()
     
-    # Judul
+    # Judul Laporan
     pdf.set_font("helvetica", "B", 16)
-    pdf.cell(190, 10, "Laporan Investasi Bunga Majemuk", align="C")
-    pdf.ln(10)
+    pdf.cell(190, 10, "Laporan Investasi Bunga Majemuk", ln=True, align="C")
+    pdf.ln(5)
     
-    # Gunakan width yang lebih besar saat render agar teks tidak bertumpuk
-    img_bytes = figure.to_image(format="png", width=1200, height=700, scale=2)
-    img_buf = io.BytesIO(img_bytes)
-
-    # x=5 (melebar ke kiri) dan w=200 (memenuhi lebar kertas A4)
-    pdf.image(img_buf, x=5, y=30, w=200)
-    
-    # Pindah ke bawah grafik untuk tabel
-    pdf.set_y(155)
-    
-    # ... (bagian tabel tetap sama) ...
+    # Subheader Tabel
     pdf.set_font("helvetica", "B", 12)
-    pdf.cell(190, 10, "Tabel Pertumbuhan Tahunan")
-    pdf.ln(10)
+    pdf.cell(190, 10, "Tabel Pertumbuhan Tahunan", ln=True, align="L")
+    pdf.ln(2)
     
-    # Header Tabel
+    # --- HEADER TABEL ---
     pdf.set_font("helvetica", "B", 10)
-    pdf.set_fill_color(200, 200, 200)
+    pdf.set_fill_color(200, 200, 200) # Warna abu-abu untuk header
     pdf.cell(35, 10, "Tahun", border=1, align="C", fill=True)
     pdf.cell(75, 10, f"Value ({symbol_label})", border=1, align="C", fill=True)
     pdf.cell(75, 10, f"Kontribusi ({symbol_label})", border=1, align="C", fill=True)
     pdf.ln()
 
-    # Isi Tabel
+    # --- ISI TABEL ---
     pdf.set_font("helvetica", "", 10)
     for index, row in dataframe.iterrows():
-        if pdf.get_y() > 260: 
+        # Cek jika posisi kursor hampir mencapai batas bawah kertas (A4 sekitar 297mm)
+        # Jika ya, tambah halaman baru
+        if pdf.get_y() > 270: 
             pdf.add_page()
+            # Opsional: Print ulang header di halaman baru jika diinginkan
+            pdf.set_font("helvetica", "B", 10)
+            pdf.cell(35, 10, "Tahun", border=1, align="C", fill=True)
+            pdf.cell(75, 10, f"Value ({symbol_label})", border=1, align="C", fill=True)
+            pdf.cell(75, 10, f"Kontribusi ({symbol_label})", border=1, align="C", fill=True)
+            pdf.ln()
+            pdf.set_font("helvetica", "", 10)
+
         pdf.cell(35, 8, f"Year {int(row['Year'])}", border=1, align="C")
         pdf.cell(75, 8, f"{row['Future Value']:,.2f}", border=1, align="R")
         pdf.cell(75, 8, f"{row['Total Contributions']:,.2f}", border=1, align="R")
@@ -211,7 +255,8 @@ dl_col1, dl_col2 = st.columns(2)
 
 with dl_col1:
     try:
-        pdf_data = create_pdf(df, fig, symbol)
+        # pdf_data = create_pdf(df, fig, symbol)
+        pdf_data = create_pdf(df, symbol)
         st.download_button(
             label="Download Laporan Lengkap (PDF)",
             data=pdf_data,
