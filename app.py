@@ -15,9 +15,9 @@ def format_currency(number):
 # --- INPUT ---
 with st.sidebar:
     st.header("Investment Parameters")
-    
-    currency_choice = st.selectbox("Select Currency", options=["US Dollar ($)", "Yuan (¥)", "Rupiah (Rp)"])
-    symbol = "$" if currency_choice == "US Dollar ($)" else ("¥" if currency_choice == "Yuan (¥)" else "Rp")
+
+    currency_choice = st.selectbox("Select Currency", options=["Yuan (¥)", "US Dollar ($)", "Rupiah (Rp)"])
+    symbol = "¥" if currency_choice == "Yuan (¥)" else ("$" if currency_choice == "US Dollar ($)" else "Rp")
     
     # 1. Initial Investment Input
     principal = st.number_input(
@@ -32,7 +32,7 @@ with st.sidebar:
     monthly_contribution = st.number_input(
         f"Monthly Contribution ({symbol})", 
         value=100.0, 
-        step=50.0, 
+        step=100.0, 
         format="%.2f"
     )
     st.caption(f"Value: **{symbol} {format_currency(monthly_contribution)}**")
@@ -49,7 +49,7 @@ with st.sidebar:
             "Monthly", 
             "Daily"
         ],
-        index=3 # Defaulted to Monthly for convenience
+        index=0 # Defaulted to Annually for convenience
     )
 
 # --- CALCULATION LOGIC ---
