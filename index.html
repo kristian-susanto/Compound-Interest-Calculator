@@ -19,6 +19,14 @@
         .chart-container {
           height: 250px !important;
         }
+        table {
+          table-layout: fixed; /* Memaksa kolom mengikuti lebar layar */
+          width: 100%;
+        }
+        td,
+        th {
+          word-break: break-all; /* Mencegah angka panjang merusak layout */
+        }
       }
     </style>
   </head>
@@ -521,11 +529,12 @@
       function updateUI(data, symbol) {
         const lastEntry = data[data.length - 1];
 
-        // Update End Balance & Contributions (2 desimal)
+        // Format angka dengan 2 desimal
         const formatOptions = {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         };
+
         document.getElementById("display-balance").innerText =
           symbol + " " + lastEntry.fv.toLocaleString(undefined, formatOptions);
         document.getElementById("display-contributions").innerText =
@@ -537,8 +546,6 @@
         data.forEach((row, index) => {
           const tr = document.createElement("tr");
 
-          // Menambahkan efek striped: baris ganjil (index 1, 3, dst) diberi warna bg-gray-50
-          // Dalam Dark Mode menggunakan bg-gray-800/50 agar tetap terlihat
           const stripeClass =
             index % 2 !== 0
               ? "bg-gray-50 dark:bg-gray-800/50"
@@ -546,11 +553,12 @@
 
           tr.className = `${stripeClass} hover:bg-red-50 dark:hover:bg-gray-700 border-b dark:border-gray-700 transition-colors`;
 
+          // Perbaikan: Gunakan text-xs pada mobile dan p-2 agar lebih ringkas
           tr.innerHTML = `
-      <td class="p-3 text-left">Year ${row.year}</td>
-      <td class="p-3 text-right">${symbol} ${row.fv.toLocaleString(undefined, formatOptions)}</td>
-      <td class="p-3 text-right text-gray-600 dark:text-gray-400">${symbol} ${row.tc.toLocaleString(undefined, formatOptions)}</td>
-    `;
+            <td class="p-2 md:p-3 text-left text-[10px] sm:text-sm font-medium">Yr ${row.year}</td>
+            <td class="p-2 md:p-3 text-right text-[10px] sm:text-sm">${symbol} ${row.fv.toLocaleString(undefined, formatOptions)}</td>
+            <td class="p-2 md:p-3 text-right text-[10px] sm:text-sm text-gray-600 dark:text-gray-400">${symbol} ${row.tc.toLocaleString(undefined, formatOptions)}</td>
+          `;
           tbody.appendChild(tr);
         });
         updateChart(data, symbol);
