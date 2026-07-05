@@ -10,11 +10,9 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* Memastikan canvas grafik tidak meluap di layar sangat kecil */
       #growthChart {
         max-width: 100% !important;
       }
-      /* Mengatur tinggi grafik agar tetap proporsional di mobile */
       @media (max-width: 640px) {
         .chart-container {
           height: 250px !important;
@@ -42,11 +40,12 @@
           🧮 Compound Interest Calculator
         </h1>
         <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 px-4">
-          Project your savings and investment growth
+          Project your savings and investment growth with comparison
         </p>
       </header>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <!-- INVESTMENT PARAMETERS -->
         <div
           class="bg-white dark:bg-gray-800 p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 h-fit"
         >
@@ -57,22 +56,6 @@
           </h2>
 
           <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium mb-1"
-                >Select Currency</label
-              >
-              <select
-                id="currency"
-                onchange="calculate()"
-                class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500 outline-none text-sm"
-              >
-                <option value="¥" selected>Yuan (¥)</option>
-                <option value="$">US Dollar ($)</option>
-                <option value="Rp">Rupiah (Rp)</option>
-                <option value="¤">Other Currencies (¤)</option>
-              </select>
-            </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
               <div>
                 <label class="block text-sm font-medium mb-1"
@@ -90,7 +73,7 @@
                   id="error-principal"
                   class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
                 >
-                  Maksimal karakter tercapai
+                  Maximum characters reached
                 </p>
               </div>
               <div>
@@ -109,7 +92,7 @@
                   id="error-monthly"
                   class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
                 >
-                  Maksimal karakter tercapai
+                  Maximum characters reached
                 </p>
               </div>
             </div>
@@ -132,13 +115,13 @@
                   id="error-years"
                   class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
                 >
-                  Maksimal 100 tahun
+                  Maximum 100 years
                 </p>
               </div>
               <div>
                 <label
                   class="block text-sm font-medium mb-1 text-[11px] sm:text-sm"
-                  >Interest Rate (%)</label
+                  >Interest Rate 1 (%)</label
                 >
                 <input
                   type="text"
@@ -152,9 +135,30 @@
                   id="error-rate"
                   class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
                 >
-                  Maksimal bunga 100%
+                  Maximum interest 100%
                 </p>
               </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-1"
+                >Interest Rate 2 (% - Optional)</label
+              >
+              <input
+                type="text"
+                id="rate2"
+                value="5.0"
+                maxlength="5"
+                oninput="handleInput(this)"
+                placeholder="Enter comparison rate..."
+                class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+              />
+              <p
+                id="error-rate2"
+                class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
+              >
+                Maximum interest 100%
+              </p>
             </div>
 
             <div>
@@ -180,36 +184,55 @@
           </div>
         </div>
 
+        <!-- OUTPUT CARDS & CHART -->
         <div class="lg:col-span-2 space-y-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div
-              class="bg-white dark:bg-gray-800 p-5 md:p-6 rounded-2xl shadow-sm border-l-4 border-red-500"
+              class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border-l-4 border-red-500"
             >
               <p
-                class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
+                id="label-balance1"
+                class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
               >
-                End Balance
+                End Balance (Rate 1)
               </p>
               <h3
                 id="display-balance"
-                class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white truncate"
+                class="text-lg md:text-xl font-bold text-gray-800 dark:text-white truncate"
               >
-                $ 0.00
+                0.00
               </h3>
             </div>
             <div
-              class="bg-white dark:bg-gray-800 p-5 md:p-6 rounded-2xl shadow-sm border-l-4 border-teal-500"
+              id="card-balance2"
+              class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border-l-4 border-blue-500"
             >
               <p
-                class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
+                id="label-balance2"
+                class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
+              >
+                End Balance (Rate 2)
+              </p>
+              <h3
+                id="display-balance2"
+                class="text-lg md:text-xl font-bold text-gray-800 dark:text-white truncate"
+              >
+                0.00
+              </h3>
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border-l-4 border-teal-500"
+            >
+              <p
+                class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
               >
                 Total Contributions
               </p>
               <h3
                 id="display-contributions"
-                class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white truncate"
+                class="text-lg md:text-xl font-bold text-gray-800 dark:text-white truncate"
               >
-                $ 0.00
+                0.00
               </h3>
             </div>
           </div>
@@ -278,6 +301,12 @@
                   >
                     Excel (XLSX)
                   </button>
+                  <button
+                    onclick="exportJSON()"
+                    class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    Data (JSON)
+                  </button>
                 </div>
               </div>
             </div>
@@ -316,7 +345,7 @@
                 class="overflow-x-auto border dark:border-gray-700 rounded-xl"
               >
                 <table
-                  class="w-full text-left text-[11px] md:text-sm min-w-[350px] border-collapse"
+                  class="w-full text-left text-[11px] md:text-sm min-w-[500px] border-collapse"
                 >
                   <thead
                     class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
@@ -327,22 +356,20 @@
                       >
                         Year
                       </th>
-                      <th class="p-2 md:p-3 font-bold text-right">
-                        Future Value
+                      <th id="th-fv1" class="p-2 md:p-3 font-bold text-right">
+                        Future Value (Rate 1)
+                      </th>
+                      <th id="th-fv2" class="p-2 md:p-3 font-bold text-right">
+                        Future Value (Rate 2)
                       </th>
                       <th class="p-2 md:p-3 font-bold text-right">
-                        Contributions
+                        Total Contributions
                       </th>
                     </tr>
                   </thead>
                   <tbody id="table-body"></tbody>
                 </table>
               </div>
-              <p
-                class="text-[10px] text-gray-400 mt-2 block md:hidden italic text-center"
-              >
-                *Slide the table sideways to see details
-              </p>
             </div>
           </div>
         </div>
@@ -355,7 +382,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <script>
-      // TAILWIND CONFIG & LOGIC (Tetap sama seperti kode Anda)
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -375,7 +401,6 @@
       let myChart = null;
       let globalData = [];
 
-      // Fungsi Masking Ribuan
       function formatNumberWithCommas(n) {
         return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       }
@@ -385,7 +410,6 @@
       }
 
       function showErrorEffect(el) {
-        // 1. Efek visual pada input
         el.classList.add(
           "animate-shake",
           "border-red-500",
@@ -393,15 +417,11 @@
           "ring-red-500",
         );
         el.classList.remove("dark:border-gray-600");
-
-        // 2. Tampilkan pesan teks di bawahnya
         const errorMsg = document.getElementById(`error-${el.id}`);
         if (errorMsg) {
           errorMsg.classList.remove("opacity-0");
           errorMsg.classList.add("opacity-100");
         }
-
-        // 3. Kembalikan ke normal setelah 1 detik
         setTimeout(() => {
           el.classList.remove(
             "animate-shake",
@@ -423,41 +443,35 @@
         let isInvalid = false;
 
         if (el.id === "years") {
-          let rawValue = el.value.replace(/\D/g, ""); // Hanya angka
+          let rawValue = el.value.replace(/\D/g, "");
           let numValue = parseInt(rawValue);
-
-          // Jika lebih dari 100, baru dianggap invalid
           if (numValue > 100) {
             isInvalid = true;
             setTimeout(() => {
               if (parseInt(el.value) > 100) {
-                el.value = "100"; // Paksa balik ke 100
+                el.value = "100";
                 calculate();
               }
             }, 800);
           } else {
             el.value = rawValue;
           }
-        } else if (el.id === "rate") {
-          // Izinkan angka dan titik desimal
+        } else if (el.id === "rate" || el.id === "rate2") {
           el.value = el.value.replace(/[^0-9.]/g, "");
           let parts = el.value.split(".");
           if (parts.length > 2)
             el.value = parts[0] + "." + parts.slice(1).join("");
-
           let numValue = parseFloat(el.value);
-          // Jika lebih dari 100, baru dianggap invalid
           if (numValue > 100) {
             isInvalid = true;
             setTimeout(() => {
               if (parseFloat(el.value) > 100) {
-                el.value = "100"; // Paksa balik ke 100
+                el.value = "100";
                 calculate();
               }
             }, 800);
           }
         } else {
-          // Logika untuk Principal & Monthly tetap (max 15 digit)
           let rawValue = el.value.replace(/\D/g, "");
           if (rawValue.length > 15) {
             rawValue = rawValue.substring(0, 15);
@@ -466,15 +480,10 @@
           el.value = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
-        if (isInvalid) {
-          showErrorEffect(el);
-        }
-
-        // Kembalikan posisi kursor
+        if (isInvalid) showErrorEffect(el);
         let newLength = el.value.length;
         cursorPosition = cursorPosition + (newLength - originalLength);
         el.setSelectionRange(cursorPosition, cursorPosition);
-
         calculate();
       }
 
@@ -491,7 +500,6 @@
       }
 
       function calculate() {
-        const symbol = document.getElementById("currency").value;
         const principal = parseFormattedNumber(
           document.getElementById("principal").value,
         );
@@ -501,123 +509,181 @@
         const years = parseFormattedNumber(
           document.getElementById("years").value,
         );
-        const annualRate =
-          (parseFloat(document.getElementById("rate").value) || 0) / 100;
         const n = parseInt(document.getElementById("frequency").value);
 
-        let currentBalance = principal;
+        const annualRate1 =
+          (parseFloat(document.getElementById("rate").value) || 0) / 100;
+        const rate2Input = document.getElementById("rate2").value;
+        const hasRate2 =
+          rate2Input.trim() !== "" && !isNaN(parseFloat(rate2Input));
+        const annualRate2 = hasRate2 ? parseFloat(rate2Input) / 100 : null;
+
+        let currentBalance1 = principal;
+        let currentBalance2 = principal;
         let totalContributions = principal;
+
         const data = [];
-        data.push({ year: 0, fv: currentBalance, tc: totalContributions });
+        data.push({
+          year: 0,
+          fv1: currentBalance1,
+          fv2: hasRate2 ? currentBalance2 : null,
+          tc: totalContributions,
+        });
 
         for (let y = 1; y <= years; y++) {
           const yearlyContribution = monthlyContr * 12;
           if (n === 1) {
-            currentBalance =
-              currentBalance * (1 + annualRate) + yearlyContribution;
+            currentBalance1 =
+              currentBalance1 * (1 + annualRate1) + yearlyContribution;
+            if (hasRate2)
+              currentBalance2 =
+                currentBalance2 * (1 + annualRate2) + yearlyContribution;
           } else {
             const contributionPerPeriod = yearlyContribution / n;
             for (let p = 0; p < n; p++) {
-              currentBalance =
-                currentBalance * (1 + annualRate / n) + contributionPerPeriod;
+              currentBalance1 =
+                currentBalance1 * (1 + annualRate1 / n) + contributionPerPeriod;
+              if (hasRate2)
+                currentBalance2 =
+                  currentBalance2 * (1 + annualRate2 / n) +
+                  contributionPerPeriod;
             }
           }
           totalContributions += yearlyContribution;
-          data.push({ year: y, fv: currentBalance, tc: totalContributions });
+          data.push({
+            year: y,
+            fv1: currentBalance1,
+            fv2: hasRate2 ? currentBalance2 : null,
+            tc: totalContributions,
+          });
         }
         globalData = data;
-        updateUI(data, symbol);
+        updateUI(data, hasRate2);
       }
 
-      function updateUI(data, symbol) {
+      function updateUI(data, hasRate2) {
         const lastEntry = data[data.length - 1];
-
-        // Update End Balance & Contributions (2 desimal)
         const formatOptions = {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         };
+
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        // Dynamically change the End Balance text at the top
+        document.getElementById("label-balance1").innerText =
+          `End Balance (${r1Val}%)`;
         document.getElementById("display-balance").innerText =
-          symbol + " " + lastEntry.fv.toLocaleString(undefined, formatOptions);
+          lastEntry.fv1.toLocaleString(undefined, formatOptions);
         document.getElementById("display-contributions").innerText =
-          symbol + " " + lastEntry.tc.toLocaleString(undefined, formatOptions);
+          lastEntry.tc.toLocaleString(undefined, formatOptions);
+
+        // Dynamically change the name of the first column of the table
+        document.getElementById("th-fv1").innerText =
+          `Future Value (${r1Val}%)`;
+
+        const cardBalance2 = document.getElementById("card-balance2");
+        if (hasRate2) {
+          cardBalance2.classList.remove("hidden");
+          document.getElementById("label-balance2").innerText =
+            `End Balance (${r2Val}%)`;
+          document.getElementById("display-balance2").innerText =
+            lastEntry.fv2.toLocaleString(undefined, formatOptions);
+
+          const thFv2 = document.getElementById("th-fv2");
+          thFv2.classList.remove("hidden");
+          thFv2.innerText = `Future Value (${r2Val}%)`;
+        } else {
+          cardBalance2.classList.add("hidden");
+          document.getElementById("th-fv2").classList.add("hidden");
+        }
 
         const tbody = document.getElementById("table-body");
         tbody.innerHTML = "";
 
         data.forEach((row, index) => {
           const tr = document.createElement("tr");
-
           const stripeClass =
             index % 2 !== 0
               ? "bg-gray-50 dark:bg-gray-800/50"
               : "bg-white dark:bg-gray-800";
-
           tr.className = `${stripeClass} hover:bg-red-50 dark:hover:bg-gray-700 border-b dark:border-gray-700 transition-colors`;
 
+          let fv2Cell = hasRate2
+            ? `<td class="p-2 md:p-3 text-right whitespace-nowrap">${row.fv2.toLocaleString(undefined, formatOptions)}</td>`
+            : "";
+
           tr.innerHTML = `
-    <td class="p-2 md:p-3 text-left font-medium sticky left-0 ${index % 2 !== 0 ? "bg-gray-50 dark:bg-[#1f2937]" : "bg-white dark:bg-gray-800"} z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
-      Year ${row.year}
-    </td>
-    <td class="p-2 md:p-3 text-right whitespace-nowrap">
-      ${symbol} ${row.fv.toLocaleString(undefined, formatOptions)}
-    </td>
-    <td class="p-2 md:p-3 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">
-      ${symbol} ${row.tc.toLocaleString(undefined, formatOptions)}
-    </td>
-  `;
+            <td class="p-2 md:p-3 text-left font-medium sticky left-0 ${index % 2 !== 0 ? "bg-gray-50 dark:bg-[#1f2937]" : "bg-white dark:bg-gray-800"} z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Year ${row.year}</td>
+            <td class="p-2 md:p-3 text-right whitespace-nowrap">${row.fv1.toLocaleString(undefined, formatOptions)}</td>
+            ${fv2Cell}
+            <td class="p-2 md:p-3 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">${row.tc.toLocaleString(undefined, formatOptions)}</td>
+          `;
           tbody.appendChild(tr);
         });
-        updateChart(data, symbol);
+        updateChart(data, hasRate2);
       }
 
-      function updateChart(data, symbol) {
+      function updateChart(data, hasRate2) {
         const isDark = document
           .getElementById("html-tag")
           .classList.contains("dark");
         const textColor = isDark ? "#9ca3af" : "#4b5563";
         const gridColor = isDark ? "#374151" : "#e5e7eb";
 
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
         if (myChart) myChart.destroy();
         const ctx = document.getElementById("growthChart").getContext("2d");
+
+        const datasets = [
+          {
+            // Change the legend label below the chart to Rate 1
+            label: `Future Value (${r1Val}%)`,
+            data: data.map((d) => d.fv1),
+            borderColor: "#ef4444",
+            backgroundColor: "rgba(239, 68, 68, 0.1)",
+            fill: true,
+            tension: 0.3,
+          },
+        ];
+
+        if (hasRate2) {
+          datasets.push({
+            // Change the legend label below the chart for Rate 2
+            label: `Future Value (${r2Val}%)`,
+            data: data.map((d) => d.fv2),
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: true,
+            tension: 0.3,
+          });
+        }
+
+        datasets.push({
+          label: "Total Contributions",
+          data: data.map((d) => d.tc),
+          borderColor: "#14b8a6",
+          backgroundColor: "rgba(20, 184, 166, 0.05)",
+          fill: true,
+          borderDash: [5, 5],
+          tension: 0.1,
+        });
+
         myChart = new Chart(ctx, {
           type: "line",
           data: {
             labels: data.map((d) => "Year " + d.year),
-            datasets: [
-              {
-                label: "Future Value",
-                data: data.map((d) => d.fv),
-                borderColor: "#ef4444",
-                backgroundColor: "rgba(239, 68, 68, 0.1)", // Arsiran merah
-                fill: true,
-                tension: 0.3,
-              },
-              {
-                label: "Total Contributions",
-                data: data.map((d) => d.tc),
-                borderColor: "#14b8a6",
-                backgroundColor: "rgba(20, 184, 166, 0.1)", // TAMBAHKAN INI: Arsiran hijau transparan
-                fill: true, // UBAH INI: Menjadi true agar area diarsir
-                borderDash: [5, 5],
-                tension: 0.1,
-              },
-            ],
+            datasets: datasets,
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            // 1. Tambahkan interaction mode agar mendeteksi kedua garis sekaligus
-            interaction: {
-              mode: "index",
-              intersect: false,
-            },
+            interaction: { mode: "index", intersect: false },
             plugins: {
-              legend: {
-                position: "bottom",
-                labels: { color: textColor },
-              },
-              // 2. Konfigurasi tooltip agar menampilkan semua item dalam satu kotak
+              legend: { position: "bottom", labels: { color: textColor } },
               tooltip: {
                 enabled: true,
                 mode: "index",
@@ -627,13 +693,10 @@
                     let label = context.dataset.label || "";
                     if (label) label += ": ";
                     if (context.parsed.y !== null) {
-                      label +=
-                        symbol +
-                        " " +
-                        context.parsed.y.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        });
+                      label += context.parsed.y.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      });
                     }
                     return label;
                   },
@@ -645,7 +708,7 @@
                 grid: { color: gridColor },
                 ticks: {
                   color: textColor,
-                  callback: (v) => symbol + v.toLocaleString(),
+                  callback: (v) => v.toLocaleString(),
                 },
               },
               x: { grid: { color: gridColor }, ticks: { color: textColor } },
@@ -654,12 +717,10 @@
         });
       }
 
-      // Fitur Show/Hide Table
       function toggleTable() {
         const container = document.getElementById("table-container");
         const text = document.getElementById("toggle-text");
         const icon = document.getElementById("toggle-icon");
-
         if (container.classList.contains("hidden")) {
           container.classList.remove("hidden");
           text.innerText = "HIDE TABLE";
@@ -671,135 +732,83 @@
         }
       }
 
-      // Fungsi untuk toggle menu download
       function toggleDownloadMenu() {
-        const menu = document.getElementById("download-menu");
-        menu.classList.toggle("hidden");
+        document.getElementById("download-menu").classList.toggle("hidden");
       }
 
-      // Menutup menu jika klik di luar
       window.onclick = function (event) {
         if (!event.target.closest("#menu-button")) {
           const menu = document.getElementById("download-menu");
-          if (!menu.classList.contains("hidden")) {
-            menu.classList.add("hidden");
-          }
+          if (!menu.classList.contains("hidden")) menu.classList.add("hidden");
         }
       };
 
-      // Modifikasi sedikit fungsi download agar menu tertutup setelah klik
-      const originaldownloadImage = downloadImage;
-      downloadImage = function () {
-        document.getElementById("download-menu").classList.add("hidden");
-        originaldownloadImage();
-      };
-
-      const originalExportPDF = exportPDF;
-      exportPDF = function () {
-        document.getElementById("download-menu").classList.add("hidden");
-        originalExportPDF();
-      };
-
-      const originalExportExcel = exportExcel;
-      exportExcel = function () {
-        document.getElementById("download-menu").classList.add("hidden");
-        originalExportExcel();
-      };
-
       function printChart() {
-        // Tutup menu dropdown
         document.getElementById("download-menu").classList.add("hidden");
-
         const canvas = document.getElementById("growthChart");
         const dataUrl = canvas.toDataURL("image/png");
-        const isDark = document
-          .getElementById("html-tag")
-          .classList.contains("dark");
-
-        // Membuat jendela baru untuk proses cetak
         const printWindow = window.open("", "_blank");
-
         printWindow.document.write(`
-    <html>
-      <head>
-        <title>Print Investment Projection</title>
-        <style>
-          body { 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            font-family: sans-serif; 
-            padding: 20px;
-          }
-          img { max-width: 100%; height: auto; }
-          h1 { color: #333; margin-bottom: 20px; }
-          @page { size: landscape; margin: 1cm; }
-        </style>
-      </head>
-      <body>
-        <h1>Investment Projection</h1>
-        <img src="${dataUrl}" />
-        <script>
-          window.onload = function() {
-            window.print();
-            window.onafterprint = function() { window.close(); };
-          };
-        <\/script>
-      </body>
-    </html>
-  `);
+          <html>
+            <head>
+              <title>Print Investment Projection</title>
+              <style>
+                body { margin: 0; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; padding: 20px; }
+                img { max-width: 100%; height: auto; }
+                h1 { color: #333; margin-bottom: 20px; }
+                @page { size: landscape; margin: 1cm; }
+              </style>
+            </head>
+            <body>
+              <h1>Investment Projection</h1>
+              <img src="${dataUrl}" />
+              <script>
+                window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
+              <\/script>
+            </body>
+          </html>
+        `);
         printWindow.document.close();
       }
 
-      // Fitur Download Chart sebagai Gambar (PNG) dengan Judul
       function downloadImage() {
+        document.getElementById("download-menu").classList.add("hidden");
         const canvas = document.getElementById("growthChart");
         const link = document.createElement("a");
         link.download = "investment-projection.png";
-
-        // Membuat canvas sementara dengan ruang tambahan di atas untuk judul
         const tempCanvas = document.createElement("canvas");
         const ctx = tempCanvas.getContext("2d");
-
-        // Menentukan margin atas untuk teks judul
         const titleSpace = 50;
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height + titleSpace;
-
-        // 1. Memberikan background (mengikuti tema saat ini)
         const isDark = document
           .getElementById("html-tag")
           .classList.contains("dark");
         ctx.fillStyle = isDark ? "#1f2937" : "#ffffff";
         ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-        // 2. Menambahkan Teks Judul
-        ctx.fillStyle = isDark ? "#ffffff" : "#111827"; // Warna teks judul
+        ctx.fillStyle = isDark ? "#ffffff" : "#111827";
         ctx.font = "bold 20px sans-serif";
         ctx.textAlign = "center";
-        // Menulis "Investment Projection" tepat di tengah atas
-        ctx.fillText("Investment Projection", tempCanvas.width / 2, 35);
-
-        // 3. Menggambar Chart asli di bawah judul
+        ctx.fillText(
+          "Investment Projection Comparison",
+          tempCanvas.width / 2,
+          35,
+        );
         ctx.drawImage(canvas, 0, titleSpace);
-
-        // Proses Download
         link.href = tempCanvas.toDataURL("image/png");
         link.click();
       }
 
       async function exportPDF() {
+        document.getElementById("download-menu").classList.add("hidden");
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF("p", "mm", "a4");
-        const symbol = document.getElementById("currency").value;
+        const hasRate2 = globalData[0] && globalData[0].fv2 !== null;
 
-        // Title
         doc.setFontSize(22);
         doc.setFont("helvetica", "bold");
         doc.text("Investment Projection", 105, 20, null, null, "center");
 
-        // Chart
         const chartCanvas = document.getElementById("growthChart");
         const tempCanvas = document.createElement("canvas");
         const ctx = tempCanvas.getContext("2d");
@@ -812,19 +821,33 @@
         const chartImage = tempCanvas.toDataURL("image/png");
         doc.addImage(chartImage, "PNG", 15, 30, 180, 90);
 
-        // Table title
         doc.setFontSize(16);
         doc.text("Detailed Annual Data", 15, 135);
 
-        // Data dari globalData
-        const tableBody = globalData.map((row) => [
-          `Year ${row.year}`,
-          `${symbol} ${row.fv.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          `${symbol} ${row.tc.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        ]);
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        const headers = ["Year", `Future Value (${r1Val}%)`];
+        if (hasRate2) headers.push(`Future Value (${r2Val}%)`);
+        headers.push("Total Contributions");
+
+        const tableBody = globalData.map((row) => {
+          let cols = [
+            `Year ${row.year}`,
+            `${row.fv1.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+          ];
+          if (hasRate2)
+            cols.push(
+              `${row.fv2.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+            );
+          cols.push(
+            `${row.tc.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+          );
+          return cols;
+        });
 
         doc.autoTable({
-          head: [["Year", "Future Value", "Total Contributions"]],
+          head: [headers],
           body: tableBody,
           startY: 140,
           margin: { horizontal: 15 },
@@ -832,117 +855,77 @@
             fillColor: [243, 244, 246],
             textColor: [17, 24, 39],
             fontStyle: "bold",
-            halign: "center", // Membuat header rata tengah
+            halign: "center",
           },
-          bodyStyles: {
-            textColor: [17, 24, 39],
-            fontStyle: "normal", // Memastikan seluruh body (termasuk Future Value) tidak bold
-          },
+          bodyStyles: { textColor: [17, 24, 39], fontStyle: "normal" },
           alternateRowStyles: { fillColor: [249, 250, 251] },
-          columnStyles: {
-            0: { cellWidth: 30, halign: "left" },
-            1: { cellWidth: "auto", halign: "right" },
-            2: { cellWidth: "auto", halign: "right" },
-          },
           theme: "striped",
         });
 
         doc.save("investment-projection.pdf");
       }
 
-      function downloadSVG() {
-        const canvas = document.getElementById("growthChart");
-        const width = canvas.width;
-        const height = canvas.height;
-        const titleHeight = 50;
-        const isDark = document
-          .getElementById("html-tag")
-          .classList.contains("dark");
-        const bgColor = isDark ? "#1f2937" : "#ffffff";
-        const textColor = isDark ? "#ffffff" : "#111827";
-        const dataUrl = canvas.toDataURL("image/png");
-
-        const svgString = `
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height + titleHeight}" viewBox="0 0 ${width} ${height + titleHeight}">
-            <rect width="100%" height="100%" fill="${bgColor}"/>
-            <text x="${width / 2}" y="35" font-family="sans-serif" font-size="20px" font-weight="bold" fill="${textColor}" text-anchor="middle">Investment Projection</text>
-            <image xlink:href="${dataUrl}" x="0" y="${titleHeight}" width="${width}" height="${height}"/>
-        </svg>`;
-
-        const blob = new Blob([svgString], {
-          type: "image/svg+xml;charset=utf-8",
-        });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "investment-projection.svg";
-        link.click();
-        document.getElementById("download-menu").classList.add("hidden");
-      }
-
       function exportCSV() {
         document.getElementById("download-menu").classList.add("hidden");
         if (globalData.length === 0) return;
+        const hasRate2 = globalData[0].fv2 !== null;
 
-        // Menambahkan BOM agar Excel mendeteksi pemisahan kolom dengan benar
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
         let csvContent = "\ufeff";
+        csvContent += hasRate2
+          ? `Year,Future Value (${r1Val}%),Future Value (${r2Val}%),Total Contributions\n`
+          : `Year,Future Value (${r1Val}%),Total Contributions\n`;
 
-        // Judul Kolom
-        csvContent += "Year,Future Value,Total Contributions\n";
-
-        // Isi Data dengan pembatasan maksimal 2 desimal
         globalData.forEach((row) => {
-          // Menggunakan Number.toFixed(2) untuk memastikan presisi desimal
-          const fv = parseFloat(row.fv).toFixed(2);
+          const fv1 = parseFloat(row.fv1).toFixed(2);
           const tc = parseFloat(row.tc).toFixed(2);
-          csvContent += `${row.year},${fv},${tc}\n`;
+          if (hasRate2) {
+            const fv2 = parseFloat(row.fv2).toFixed(2);
+            csvContent += `${row.year},${fv1},${fv2},${tc}\n`;
+          } else {
+            csvContent += `${row.year},${fv1},${tc}\n`;
+          }
         });
 
-        // Proses Download
         const blob = new Blob([csvContent], {
           type: "text/csv;charset=utf-8;",
         });
         const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-
-        link.setAttribute("href", url);
+        link.setAttribute("href", URL.createObjectURL(blob));
         link.setAttribute("download", "investment-projection.csv");
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
       }
 
       function exportExcel() {
-        // 1. Mempersiapkan data dengan nama kolom baru dan pembulatan 2 desimal
-        const excelData = globalData.map((row) => ({
-          Year: row.year,
-          "Future Value": parseFloat(row.fv.toFixed(2)),
-          "Total Contributions": parseFloat(row.tc.toFixed(2)),
-        }));
+        document.getElementById("download-menu").classList.add("hidden");
+        const hasRate2 = globalData[0] && globalData[0].fv2 !== null;
 
-        // 2. Membuat worksheet
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        const excelData = globalData.map((row) => {
+          let obj = {
+            Year: row.year,
+          };
+          obj[`Future Value (${r1Val}%)`] = parseFloat(row.fv1.toFixed(2));
+          if (hasRate2)
+            obj[`Future Value (${r2Val}%)`] = parseFloat(row.fv2.toFixed(2));
+          obj["Total Contributions"] = parseFloat(row.tc.toFixed(2));
+          return obj;
+        });
+
         const worksheet = XLSX.utils.json_to_sheet(excelData);
-
-        // 3. Menambahkan format angka (pemisah ribuan dan 2 desimal) ke sel yang relevan
         const range = XLSX.utils.decode_range(worksheet["!ref"]);
         for (let R = range.s.r + 1; R <= range.e.r; ++R) {
-          // Kolom B (Future Value) dan Kolom C (Total Contributions)
-          ["B", "C"].forEach((col) => {
+          let cols = hasRate2 ? ["B", "C", "D"] : ["B", "C"];
+          cols.forEach((col) => {
             const cellAddress = col + (R + 1);
-            if (worksheet[cellAddress]) {
-              worksheet[cellAddress].z = "#,##0.00"; // Format Excel untuk ribuan dan 2 desimal
-            }
+            if (worksheet[cellAddress]) worksheet[cellAddress].z = "#,##0.00";
           });
         }
 
-        // 4. Mengatur lebar kolom agar angka tidak terpotong
-        worksheet["!cols"] = [
-          { wch: 10 }, // Year
-          { wch: 20 }, // Future Value
-          { wch: 20 }, // Total Contributions
-        ];
-
-        // 5. Proses download
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(
           workbook,
@@ -950,11 +933,48 @@
           "Investment Projection",
         );
         XLSX.writeFile(workbook, "investment-projection.xlsx");
-
-        document.getElementById("download-menu").classList.add("hidden");
       }
 
-      // Init
+      function exportJSON() {
+        // Hides the dropdown menu after it is clicked
+        document.getElementById("download-menu").classList.add("hidden");
+
+        if (globalData.length === 0) return;
+
+        const hasRate2 = globalData[0].fv2 !== null;
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        // Remap data so that key objects use dynamic & clean column names
+        const formattedData = globalData.map((row) => {
+          let item = {
+            year: row.year,
+          };
+          item[`future_value_${r1Val}_percent`] = parseFloat(
+            row.fv1.toFixed(2),
+          );
+          if (hasRate2) {
+            item[`future_value_${r2Val}_percent`] = parseFloat(
+              row.fv2.toFixed(2),
+            );
+          }
+          item["total_contributions"] = parseFloat(row.tc.toFixed(2));
+          return item;
+        });
+
+        // Converts the object to a JSON string with 2-space indentation for neatness
+        const jsonString = JSON.stringify(formattedData, null, 2);
+
+        // File download process
+        const blob = new Blob([jsonString], {
+          type: "application/json;charset=utf-8;",
+        });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", "investment-projection.json");
+        link.click();
+      }
+
       if (localStorage.getItem("theme") === "dark") {
         document.getElementById("html-tag").classList.add("dark");
         document.getElementById("theme-icon").innerText = "☀️ Light Mode";

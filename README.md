@@ -2,49 +2,55 @@
 
 A modern, responsive, and feature-rich web application to project savings and investment growth over time. This tool visualizes the power of compounding through interactive charts and provides comprehensive data export options.
 
+The latest version introduces an advanced feature that allows users to compare two different interest rates simultaneously.
+
 ## ✨ Features
 
-- **Real-time Calculation:** Results update instantly as you modify investment parameters.
-- **Interactive Visualization:** Dynamic line charts powered by `Chart.js` with area shading for better data distinction.
-- **Currency Flexibility:** Support for Yuan (¥), US Dollar ($), Rupiah (Rp), and generic symbols.
-- **Flexible Compounding:** Options for Annual, Semiannual, Quarterly, Monthly, and Daily compounding frequencies.
-- **Dark Mode Support:** Smooth transition between Light and Dark themes with persistent local storage.
-- **Data Table View:** A toggleable detailed breakdown of annual future values and total contributions.
-- **Mobile Optimized:** Fully responsive design using Tailwind CSS, ensuring a great experience on phones, tablets, and desktops.
+- **Real-time & Automatic Calculation:** Results update instantly as you modify any investment parameters, without requiring a manual submit button.
+- **Interest Rate Comparison:** Compare your primary investment projection (Rate 1) with an optional secondary rate (Rate 2) on the same graph.
+- **Interactive Visualization:** Dynamic line charts powered by `Chart.js` featuring area shading and cross-rate comparisons.
+- **Flexible Compounding:** Options for Annually, Semiannually, Quarterly, Monthly, and Daily compounding frequencies.
+- **Responsive Data Table:** A toggleable, detailed breakdown of annual future values (for both rates) and total contributions, optimized with sticky layout for mobile view.
+- **Dark Mode Support:** Smooth transition between Light and Dark themes with persistent preference saved in local storage.
+- **Input Validation & Safety:** Integrated shake animation alerts and automated limits (e.g., maximum 100 years or 100% interest) to ensure accurate input.
+- **Mobile Optimized:** Fully responsive design using Tailwind CSS, ensuring a polished experience on phones, tablets, and desktops.
 
 ## 📥 Export Options
 
-This calculator goes beyond simple viewing by allowing users to take their data with them:
+This calculator allows users to export their financial projections in multiple formats:
 
-- **PDF Report:** Professional document containing the growth chart and a detailed data table.
-- **Excel (XLSX):** Properly formatted spreadsheet with numeric types and thousand separators.
-- **CSV:** Clean, comma-separated values with BOM (Byte Order Mark) for perfect encoding in Microsoft Excel.
-- **Image (PNG/SVG):** High-resolution snapshots of your projection for presentations or sharing.
-- **Print:** Direct-to-printer functionality optimized for landscape chart viewing.
+- **Report (PDF):** Generates a professional PDF containing the projection chart followed by a structured annual data table.
+- **Excel (XLSX):** Spreadsheet with mapped numeric values and proper financial formatting (`#,##0.00`).
+- **Data (CSV):** Clean, comma-separated values with Byte Order Mark (BOM) for seamless integration with Microsoft Excel.
+- **Data (JSON):** Clean JSON array payload mapping the exact annual breakdown with programmatic keys.
+- **Image (PNG):** High-resolution snapshot of the investment chart featuring a clean solid background, perfect for presentations.
+- **Print:** Dedicated direct-to-printer landscape layout functionality optimized for chart viewing.
 
 ## 🛠️ Built With
 
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) (loaded via CDN with customized dark mode utilities)
 - **Charts:** [Chart.js](https://www.chartjs.org/)
 - **Excel Export:** [SheetJS (XLSX)](https://sheetjs.com/)
 - **PDF Generation:** [jsPDF](https://github.com/parallax/jsPDF) & [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable)
 
 ## 🚀 Installation & Usage
 
-1.  Clone or download the repository.
-2.  Ensure you have an internet connection (to load dependencies from CDN).
-3.  Open the `index.html` file in any modern web browser.
-4.  No build process or server-side setup is required.
+1. Clone or download the project files.
+2. Ensure you have an internet connection to load the required library dependencies from CDNs.
+3. Open the `index.html` file directly in any modern web browser.
+4. No compilation, build processes, or server-side setups are required.
 
-## 📝 Mathematical Logic
+## 📝 Mathematical & Application Logic
 
-The calculator uses an iterative approach to account for monthly contributions and compounding frequencies:
+The calculator uses an iterative annual loop to calculate compounding growth while accurately distributing regular monthly contributions:
 
 - **For Annual Compounding ($n=1$):**
-  $$Balance_{new} = Balance_{current} \times (1 + Rate) + AnnualContribution$$
+  $$Balance_{new} = Balance_{current} \times (1 + Rate_{annual}) + YearlyContribution$$
 
 - **For Periodic Compounding ($n > 1$):**
-  The yearly contribution is divided by the compounding frequency and applied at each interval using the periodic rate ($Rate / n$).
+  The yearly contribution is broken down evenly into the selected period frequency ($Contribution / n$) and compounded incrementally using the periodic rate ($Rate_{annual} / n$) throughout each interval.
+- **Multi-Rate Processing:**
+  If an optional second interest rate is provided, the application mirrors the identical mathematical loop independently to render the comparison data lines and table columns simultaneously.
 
 ---
 
