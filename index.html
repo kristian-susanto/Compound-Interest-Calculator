@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en" id="html-tag">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compound Interest Calculator</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪄</text></svg>"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      #growthChart {
+        max-width: 100% !important;
+      }
+      @media (max-width: 640px) {
+        .chart-container {
+          height: 250px !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 transition-colors duration-300"
+  >
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+      <div class="flex justify-end mb-4">
+        <button
+          onclick="toggleDarkMode()"
+          class="p-2 text-xs md:text-sm rounded-lg bg-gray-200 dark:bg-gray-700 hover:ring-2 ring-red-500 transition-all"
+        >
+          <span id="theme-icon">🌙 Dark Mode</span>
+        </button>
+      </div>
+
+      <header class="mb-8 text-center">
+        <h1
+          class="text-2xl md:text-4xl font-extrabold text-gray-800 dark:text-white mb-2"
+        >
+          🧮 Compound Interest Calculator
+        </h1>
+        <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 px-4">
+          Project your savings and investment growth with comparison
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        <!-- INVESTMENT PARAMETERS -->
+        <div
+          class="bg-white dark:bg-gray-800 p-5 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 h-fit"
+        >
+          <h2
+            class="text-lg md:text-xl font-bold mb-4 border-b dark:border-gray-700 pb-2 text-center lg:text-left"
+          >
+            Investment Parameters
+          </h2>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+              <div>
+                <label class="block text-sm font-medium mb-1"
+                  >Initial Investment</label
+                >
+                <input
+                  type="text"
+                  id="principal"
+                  value="1,000"
+                  maxlength="100"
+                  oninput="handleInput(this)"
+                  class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                />
+                <p
+                  id="error-principal"
+                  class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
+                >
+                  Maximum characters reached
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1"
+                  >Monthly Contribution</label
+                >
+                <input
+                  type="text"
+                  id="monthly"
+                  value="100"
+                  maxlength="100"
+                  oninput="handleInput(this)"
+                  class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                />
+                <p
+                  id="error-monthly"
+                  class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
+                >
+                  Maximum characters reached
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-1 gap-4">
+              <div>
+                <label
+                  class="block text-sm font-medium mb-1 text-[11px] sm:text-sm"
+                  >Period (Years)</label
+                >
+                <input
+                  type="text"
+                  id="years"
+                  value="10"
+                  maxlength="3"
+                  oninput="handleInput(this)"
+                  class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                />
+                <p
+                  id="error-years"
+                  class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
+                >
+                  Maximum 100 years
+                </p>
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium mb-1 text-[11px] sm:text-sm"
+                  >Interest Rate 1 (%)</label
+                >
+                <input
+                  type="text"
+                  id="rate"
+                  value="10.00"
+                  maxlength="5"
+                  oninput="handleInput(this)"
+                  class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                />
+                <p
+                  id="error-rate"
+                  class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
+                >
+                  Maximum interest 100%
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-1"
+                >Interest Rate 2 (% - Optional)</label
+              >
+              <input
+                type="text"
+                id="rate2"
+                value="5.00"
+                maxlength="5"
+                oninput="handleInput(this)"
+                placeholder="Enter comparison rate..."
+                class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+              />
+              <p
+                id="error-rate2"
+                class="text-[10px] text-red-500 mt-1 h-3 opacity-0 transition-opacity"
+              >
+                Maximum interest 100%
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium mb-1"
+                >Compounding Frequency</label
+              >
+              <select
+                id="frequency"
+                onchange="calculate()"
+                class="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 focus:ring-2 focus:ring-red-500 outline-none text-sm"
+              >
+                <option value="1" selected>Annually</option>
+                <option value="2">Semiannually</option>
+                <option value="4">Quarterly</option>
+                <option value="12">Monthly</option>
+                <option value="365">Daily</option>
+              </select>
+            </div>
+
+            <p class="text-[10px] text-gray-400 italic text-center">
+              *Results update automatically
+            </p>
+          </div>
+        </div>
+
+        <!-- OUTPUT CARDS & CHART -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div
+              class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border-l-4 border-red-500"
+            >
+              <p
+                id="label-balance1"
+                class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
+              >
+                End Balance (Rate 1)
+              </p>
+              <h3
+                id="display-balance"
+                class="text-lg md:text-xl font-bold text-gray-800 dark:text-white truncate"
+              >
+                0.00
+              </h3>
+            </div>
+            <div
+              id="card-balance2"
+              class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border-l-4 border-blue-500"
+            >
+              <p
+                id="label-balance2"
+                class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
+              >
+                End Balance (Rate 2)
+              </p>
+              <h3
+                id="display-balance2"
+                class="text-lg md:text-xl font-bold text-gray-800 dark:text-white truncate"
+              >
+                0.00
+              </h3>
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border-l-4 border-teal-500"
+            >
+              <p
+                class="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider"
+              >
+                Total Contributions
+              </p>
+              <h3
+                id="display-contributions"
+                class="text-lg md:text-xl font-bold text-gray-800 dark:text-white truncate"
+              >
+                0.00
+              </h3>
+            </div>
+          </div>
+
+          <div
+            class="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 relative"
+          >
+            <div class="flex items-center justify-between mb-4 gap-2">
+              <div class="w-8 hidden sm:block"></div>
+              <h3
+                class="text-md md:text-lg font-bold text-gray-800 dark:text-white text-center"
+              >
+                Investment Projection
+              </h3>
+              <div class="relative">
+                <button
+                  onclick="toggleDownloadMenu()"
+                  class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  id="menu-button"
+                >
+                  <svg
+                    class="w-5 h-5 text-gray-600 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 6h16M4 12h16M4 18h16"
+                    ></path>
+                  </svg>
+                </button>
+                <div
+                  id="download-menu"
+                  class="hidden absolute right-0 mt-2 w-40 origin-top-right bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 py-1 overflow-hidden"
+                >
+                  <button
+                    onclick="printChart()"
+                    class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    Print Chart
+                  </button>
+                  <button
+                    onclick="downloadImage()"
+                    class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    Image (PNG)
+                  </button>
+                  <button
+                    onclick="exportPDF()"
+                    class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    Report (PDF)
+                  </button>
+                  <button
+                    onclick="exportCSV()"
+                    class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    Data (CSV)
+                  </button>
+                  <button
+                    onclick="exportExcel()"
+                    class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    Excel (XLSX)
+                  </button>
+                  <button
+                    onclick="exportJSON()"
+                    class="w-full text-left px-4 py-2 text-xs hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    Data (JSON)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-container h-[300px] md:h-[350px] w-full">
+              <canvas id="growthChart"></canvas>
+            </div>
+
+            <div
+              class="flex justify-center border-t dark:border-gray-700 pt-4 mt-4"
+            >
+              <button
+                onclick="toggleTable()"
+                class="text-xs font-bold text-red-500 hover:text-red-600 flex items-center gap-2 transition-all"
+              >
+                <span id="toggle-text">SHOW TABLE</span>
+                <svg
+                  id="toggle-icon"
+                  class="w-4 h-4 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+
+            <div id="table-container" class="hidden mt-4">
+              <div
+                class="overflow-x-auto border dark:border-gray-700 rounded-xl"
+              >
+                <table
+                  class="w-full text-left text-[11px] md:text-sm min-w-[500px] border-collapse"
+                >
+                  <thead
+                    class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  >
+                    <tr>
+                      <th
+                        class="p-2 md:p-3 font-bold sticky left-0 bg-gray-100 dark:bg-gray-700 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
+                      >
+                        Year
+                      </th>
+                      <th id="th-fv1" class="p-2 md:p-3 font-bold text-right">
+                        Future Value (Rate 1)
+                      </th>
+                      <th id="th-fv2" class="p-2 md:p-3 font-bold text-right">
+                        Future Value (Rate 2)
+                      </th>
+                      <th class="p-2 md:p-3 font-bold text-right">
+                        Total Contributions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            keyframes: {
+              shake: {
+                "0%, 100%": { transform: "translateX(0)" },
+                "25%": { transform: "translateX(-4px)" },
+                "75%": { transform: "translateX(4px)" },
+              },
+            },
+            animation: { shake: "shake 0.2s ease-in-out 0s 2" },
+          },
+        },
+      };
+
+      let myChart = null;
+      let globalData = [];
+
+      function formatNumberWithCommas(n) {
+        return n.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      function parseFormattedNumber(n) {
+        return parseFloat(n.replace(/,/g, "")) || 0;
+      }
+
+      function showErrorEffect(el) {
+        el.classList.add(
+          "animate-shake",
+          "border-red-500",
+          "ring-2",
+          "ring-red-500",
+        );
+        el.classList.remove("dark:border-gray-600");
+        const errorMsg = document.getElementById(`error-${el.id}`);
+        if (errorMsg) {
+          errorMsg.classList.remove("opacity-0");
+          errorMsg.classList.add("opacity-100");
+        }
+        setTimeout(() => {
+          el.classList.remove(
+            "animate-shake",
+            "border-red-500",
+            "ring-2",
+            "ring-red-500",
+          );
+          el.classList.add("dark:border-gray-600");
+          if (errorMsg) {
+            errorMsg.classList.remove("opacity-100");
+            errorMsg.classList.add("opacity-0");
+          }
+        }, 1000);
+      }
+
+      function handleInput(el) {
+        let cursorPosition = el.selectionStart;
+        let originalLength = el.value.length;
+        let isInvalid = false;
+
+        if (el.id === "years") {
+          let rawValue = el.value.replace(/\D/g, "");
+          let numValue = parseInt(rawValue);
+          if (numValue > 100) {
+            isInvalid = true;
+            setTimeout(() => {
+              if (parseInt(el.value) > 100) {
+                el.value = "100";
+                calculate();
+              }
+            }, 800);
+          } else {
+            el.value = rawValue;
+          }
+        } else if (el.id === "rate" || el.id === "rate2") {
+          el.value = el.value.replace(/[^0-9.]/g, "");
+          let parts = el.value.split(".");
+          if (parts.length > 2)
+            el.value = parts[0] + "." + parts.slice(1).join("");
+          let numValue = parseFloat(el.value);
+          if (numValue > 100) {
+            isInvalid = true;
+            setTimeout(() => {
+              if (parseFloat(el.value) > 100) {
+                el.value = "100";
+                calculate();
+              }
+            }, 800);
+          }
+        } else {
+          let rawValue = el.value.replace(/\D/g, "");
+          if (rawValue.length > 15) {
+            rawValue = rawValue.substring(0, 15);
+            isInvalid = true;
+          }
+          el.value = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        if (isInvalid) showErrorEffect(el);
+        let newLength = el.value.length;
+        cursorPosition = cursorPosition + (newLength - originalLength);
+        el.setSelectionRange(cursorPosition, cursorPosition);
+        calculate();
+      }
+
+      function toggleDarkMode() {
+        const html = document.getElementById("html-tag");
+        html.classList.toggle("dark");
+        localStorage.setItem(
+          "theme",
+          html.classList.contains("dark") ? "dark" : "light",
+        );
+        document.getElementById("theme-icon").innerText =
+          html.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+        calculate();
+      }
+
+      function calculate() {
+        const principal = parseFormattedNumber(
+          document.getElementById("principal").value,
+        );
+        const monthlyContr = parseFormattedNumber(
+          document.getElementById("monthly").value,
+        );
+        const years = parseFormattedNumber(
+          document.getElementById("years").value,
+        );
+        const n = parseInt(document.getElementById("frequency").value);
+
+        const annualRate1 =
+          (parseFloat(document.getElementById("rate").value) || 0) / 100;
+        const rate2Input = document.getElementById("rate2").value;
+        const hasRate2 =
+          rate2Input.trim() !== "" && !isNaN(parseFloat(rate2Input));
+        const annualRate2 = hasRate2 ? parseFloat(rate2Input) / 100 : null;
+
+        let currentBalance1 = principal;
+        let currentBalance2 = principal;
+        let totalContributions = principal;
+
+        const data = [];
+        data.push({
+          year: 0,
+          fv1: currentBalance1,
+          fv2: hasRate2 ? currentBalance2 : null,
+          tc: totalContributions,
+        });
+
+        for (let y = 1; y <= years; y++) {
+          const yearlyContribution = monthlyContr * 12;
+          if (n === 1) {
+            currentBalance1 =
+              currentBalance1 * (1 + annualRate1) + yearlyContribution;
+            if (hasRate2)
+              currentBalance2 =
+                currentBalance2 * (1 + annualRate2) + yearlyContribution;
+          } else {
+            const contributionPerPeriod = yearlyContribution / n;
+            for (let p = 0; p < n; p++) {
+              currentBalance1 =
+                currentBalance1 * (1 + annualRate1 / n) + contributionPerPeriod;
+              if (hasRate2)
+                currentBalance2 =
+                  currentBalance2 * (1 + annualRate2 / n) +
+                  contributionPerPeriod;
+            }
+          }
+          totalContributions += yearlyContribution;
+          data.push({
+            year: y,
+            fv1: currentBalance1,
+            fv2: hasRate2 ? currentBalance2 : null,
+            tc: totalContributions,
+          });
+        }
+        globalData = data;
+        updateUI(data, hasRate2);
+      }
+
+      function updateUI(data, hasRate2) {
+        const lastEntry = data[data.length - 1];
+        const formatOptions = {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        };
+
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        // Dynamically change the End Balance text at the top
+        document.getElementById("label-balance1").innerText =
+          `End Balance (${r1Val}%)`;
+        document.getElementById("display-balance").innerText =
+          lastEntry.fv1.toLocaleString(undefined, formatOptions);
+        document.getElementById("display-contributions").innerText =
+          lastEntry.tc.toLocaleString(undefined, formatOptions);
+
+        // Dynamically change the name of the first column of the table
+        document.getElementById("th-fv1").innerText =
+          `Future Value (${r1Val}%)`;
+
+        const cardBalance2 = document.getElementById("card-balance2");
+        if (hasRate2) {
+          cardBalance2.classList.remove("hidden");
+          document.getElementById("label-balance2").innerText =
+            `End Balance (${r2Val}%)`;
+          document.getElementById("display-balance2").innerText =
+            lastEntry.fv2.toLocaleString(undefined, formatOptions);
+
+          const thFv2 = document.getElementById("th-fv2");
+          thFv2.classList.remove("hidden");
+          thFv2.innerText = `Future Value (${r2Val}%)`;
+        } else {
+          cardBalance2.classList.add("hidden");
+          document.getElementById("th-fv2").classList.add("hidden");
+        }
+
+        const tbody = document.getElementById("table-body");
+        tbody.innerHTML = "";
+
+        data.forEach((row, index) => {
+          const tr = document.createElement("tr");
+          const stripeClass =
+            index % 2 !== 0
+              ? "bg-gray-50 dark:bg-gray-800/50"
+              : "bg-white dark:bg-gray-800";
+          tr.className = `${stripeClass} hover:bg-red-50 dark:hover:bg-gray-700 border-b dark:border-gray-700 transition-colors`;
+
+          let fv2Cell = hasRate2
+            ? `<td class="p-2 md:p-3 text-right whitespace-nowrap">${row.fv2.toLocaleString(undefined, formatOptions)}</td>`
+            : "";
+
+          tr.innerHTML = `
+            <td class="p-2 md:p-3 text-left font-medium sticky left-0 ${index % 2 !== 0 ? "bg-gray-50 dark:bg-[#1f2937]" : "bg-white dark:bg-gray-800"} z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Year ${row.year}</td>
+            <td class="p-2 md:p-3 text-right whitespace-nowrap">${row.fv1.toLocaleString(undefined, formatOptions)}</td>
+            ${fv2Cell}
+            <td class="p-2 md:p-3 text-right text-gray-600 dark:text-gray-400 whitespace-nowrap">${row.tc.toLocaleString(undefined, formatOptions)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        updateChart(data, hasRate2);
+      }
+
+      function updateChart(data, hasRate2) {
+        const isDark = document
+          .getElementById("html-tag")
+          .classList.contains("dark");
+        const textColor = isDark ? "#9ca3af" : "#4b5563";
+        const gridColor = isDark ? "#374151" : "#e5e7eb";
+
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        if (myChart) myChart.destroy();
+        const ctx = document.getElementById("growthChart").getContext("2d");
+
+        const datasets = [
+          {
+            // Change the legend label below the chart to Rate 1
+            label: `Future Value (${r1Val}%)`,
+            data: data.map((d) => d.fv1),
+            borderColor: "#ef4444",
+            backgroundColor: "rgba(239, 68, 68, 0.1)",
+            fill: true,
+            tension: 0.3,
+          },
+        ];
+
+        if (hasRate2) {
+          datasets.push({
+            // Change the legend label below the chart for Rate 2
+            label: `Future Value (${r2Val}%)`,
+            data: data.map((d) => d.fv2),
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: true,
+            tension: 0.3,
+          });
+        }
+
+        datasets.push({
+          label: "Total Contributions",
+          data: data.map((d) => d.tc),
+          borderColor: "#14b8a6",
+          backgroundColor: "rgba(20, 184, 166, 0.05)",
+          fill: true,
+          borderDash: [5, 5],
+          tension: 0.1,
+        });
+
+        myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.map((d) => "Year " + d.year),
+            datasets: datasets,
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: { position: "bottom", labels: { color: textColor } },
+              tooltip: {
+                enabled: true,
+                mode: "index",
+                intersect: false,
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) label += ": ";
+                    if (context.parsed.y !== null) {
+                      label += context.parsed.y.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      });
+                    }
+                    return label;
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                grid: { color: gridColor },
+                ticks: {
+                  color: textColor,
+                  callback: (v) => v.toLocaleString(),
+                },
+              },
+              x: { grid: { color: gridColor }, ticks: { color: textColor } },
+            },
+          },
+        });
+      }
+
+      function toggleTable() {
+        const container = document.getElementById("table-container");
+        const text = document.getElementById("toggle-text");
+        const icon = document.getElementById("toggle-icon");
+        if (container.classList.contains("hidden")) {
+          container.classList.remove("hidden");
+          text.innerText = "HIDE TABLE";
+          icon.classList.add("rotate-180");
+        } else {
+          container.classList.add("hidden");
+          text.innerText = "SHOW TABLE";
+          icon.classList.remove("rotate-180");
+        }
+      }
+
+      function toggleDownloadMenu() {
+        document.getElementById("download-menu").classList.toggle("hidden");
+      }
+
+      window.onclick = function (event) {
+        if (!event.target.closest("#menu-button")) {
+          const menu = document.getElementById("download-menu");
+          if (!menu.classList.contains("hidden")) menu.classList.add("hidden");
+        }
+      };
+
+      function printChart() {
+        document.getElementById("download-menu").classList.add("hidden");
+        const canvas = document.getElementById("growthChart");
+        const dataUrl = canvas.toDataURL("image/png");
+        const printWindow = window.open("", "_blank");
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Print Investment Projection</title>
+              <style>
+                body { margin: 0; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; padding: 20px; }
+                img { max-width: 100%; height: auto; }
+                h1 { color: #333; margin-bottom: 20px; }
+                @page { size: landscape; margin: 1cm; }
+              </style>
+            </head>
+            <body>
+              <h1>Investment Projection</h1>
+              <img src="${dataUrl}" />
+              <script>
+                window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
+              <\/script>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+      }
+
+      function downloadImage() {
+        document.getElementById("download-menu").classList.add("hidden");
+        const canvas = document.getElementById("growthChart");
+        const link = document.createElement("a");
+        link.download = "investment-projection.png";
+        const tempCanvas = document.createElement("canvas");
+        const ctx = tempCanvas.getContext("2d");
+        const titleSpace = 50;
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height + titleSpace;
+        const isDark = document
+          .getElementById("html-tag")
+          .classList.contains("dark");
+        ctx.fillStyle = isDark ? "#1f2937" : "#ffffff";
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        ctx.fillStyle = isDark ? "#ffffff" : "#111827";
+        ctx.font = "bold 20px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          "Investment Projection Comparison",
+          tempCanvas.width / 2,
+          35,
+        );
+        ctx.drawImage(canvas, 0, titleSpace);
+        link.href = tempCanvas.toDataURL("image/png");
+        link.click();
+      }
+
+      async function exportPDF() {
+        document.getElementById("download-menu").classList.add("hidden");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF("p", "mm", "a4");
+        const hasRate2 = globalData[0] && globalData[0].fv2 !== null;
+
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.text("Investment Projection", 105, 20, null, null, "center");
+
+        const chartCanvas = document.getElementById("growthChart");
+        const tempCanvas = document.createElement("canvas");
+        const ctx = tempCanvas.getContext("2d");
+        tempCanvas.width = chartCanvas.width;
+        tempCanvas.height = chartCanvas.height;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        ctx.drawImage(chartCanvas, 0, 0);
+
+        const chartImage = tempCanvas.toDataURL("image/png");
+        doc.addImage(chartImage, "PNG", 15, 30, 180, 90);
+
+        doc.setFontSize(16);
+        doc.text("Detailed Annual Data", 15, 135);
+
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        const headers = ["Year", `Future Value (${r1Val}%)`];
+        if (hasRate2) headers.push(`Future Value (${r2Val}%)`);
+        headers.push("Total Contributions");
+
+        const tableBody = globalData.map((row) => {
+          let cols = [
+            `Year ${row.year}`,
+            `${row.fv1.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+          ];
+          if (hasRate2)
+            cols.push(
+              `${row.fv2.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+            );
+          cols.push(
+            `${row.tc.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+          );
+          return cols;
+        });
+
+        doc.autoTable({
+          head: [headers],
+          body: tableBody,
+          startY: 140,
+          margin: { horizontal: 15 },
+          headStyles: {
+            fillColor: [243, 244, 246],
+            textColor: [17, 24, 39],
+            fontStyle: "bold",
+            halign: "center",
+          },
+          bodyStyles: { textColor: [17, 24, 39], fontStyle: "normal" },
+          alternateRowStyles: { fillColor: [249, 250, 251] },
+          theme: "striped",
+        });
+
+        doc.save("investment-projection.pdf");
+      }
+
+      function exportCSV() {
+        document.getElementById("download-menu").classList.add("hidden");
+        if (globalData.length === 0) return;
+        const hasRate2 = globalData[0].fv2 !== null;
+
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        let csvContent = "\ufeff";
+        csvContent += hasRate2
+          ? `Year,Future Value (${r1Val}%),Future Value (${r2Val}%),Total Contributions\n`
+          : `Year,Future Value (${r1Val}%),Total Contributions\n`;
+
+        globalData.forEach((row) => {
+          const fv1 = parseFloat(row.fv1).toFixed(2);
+          const tc = parseFloat(row.tc).toFixed(2);
+          if (hasRate2) {
+            const fv2 = parseFloat(row.fv2).toFixed(2);
+            csvContent += `${row.year},${fv1},${fv2},${tc}\n`;
+          } else {
+            csvContent += `${row.year},${fv1},${tc}\n`;
+          }
+        });
+
+        const blob = new Blob([csvContent], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", "investment-projection.csv");
+        link.click();
+      }
+
+      function exportExcel() {
+        document.getElementById("download-menu").classList.add("hidden");
+        const hasRate2 = globalData[0] && globalData[0].fv2 !== null;
+
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        const excelData = globalData.map((row) => {
+          let obj = {
+            Year: row.year,
+          };
+          obj[`Future Value (${r1Val}%)`] = parseFloat(row.fv1.toFixed(2));
+          if (hasRate2)
+            obj[`Future Value (${r2Val}%)`] = parseFloat(row.fv2.toFixed(2));
+          obj["Total Contributions"] = parseFloat(row.tc.toFixed(2));
+          return obj;
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const range = XLSX.utils.decode_range(worksheet["!ref"]);
+        for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+          let cols = hasRate2 ? ["B", "C", "D"] : ["B", "C"];
+          cols.forEach((col) => {
+            const cellAddress = col + (R + 1);
+            if (worksheet[cellAddress]) worksheet[cellAddress].z = "#,##0.00";
+          });
+        }
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(
+          workbook,
+          worksheet,
+          "Investment Projection",
+        );
+        XLSX.writeFile(workbook, "investment-projection.xlsx");
+      }
+
+      function exportJSON() {
+        // Hides the dropdown menu after it is clicked
+        document.getElementById("download-menu").classList.add("hidden");
+
+        if (globalData.length === 0) return;
+
+        const hasRate2 = globalData[0].fv2 !== null;
+        const r1Val = document.getElementById("rate").value || "0";
+        const r2Val = document.getElementById("rate2").value || "0";
+
+        // Remap data so that key objects use dynamic & clean column names
+        const formattedData = globalData.map((row) => {
+          let item = {
+            year: row.year,
+          };
+          item[`future_value_${r1Val}_percent`] = parseFloat(
+            row.fv1.toFixed(2),
+          );
+          if (hasRate2) {
+            item[`future_value_${r2Val}_percent`] = parseFloat(
+              row.fv2.toFixed(2),
+            );
+          }
+          item["total_contributions"] = parseFloat(row.tc.toFixed(2));
+          return item;
+        });
+
+        // Converts the object to a JSON string with 2-space indentation for neatness
+        const jsonString = JSON.stringify(formattedData, null, 2);
+
+        // File download process
+        const blob = new Blob([jsonString], {
+          type: "application/json;charset=utf-8;",
+        });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", "investment-projection.json");
+        link.click();
+      }
+
+      if (localStorage.getItem("theme") === "dark") {
+        document.getElementById("html-tag").classList.add("dark");
+        document.getElementById("theme-icon").innerText = "☀️ Light Mode";
+      }
+      window.onload = calculate;
+    </script>
+  </body>
+</html>
